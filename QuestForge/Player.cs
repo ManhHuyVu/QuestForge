@@ -10,7 +10,7 @@ namespace QuestForge
         public double Attack {get; set;} // Attack point
         public int Score { get; set; }
 
-        private List<Dictionary<string,int>> inventory; // List of dictionary to store item name and quantity
+        private List<Dictionary<Item,int>> inventory; // List of dictionary to store item name and quantity
         // TODO: Does this one need a description of the item as well? Maybe a separate Item class? (string for now)
 
         public Player(string name)
@@ -18,6 +18,8 @@ namespace QuestForge
             Name = name;
             Level = 1;
             Experience = 0;
+            Attack = 10.0; // Starting attack point
+            Score = 0;
             inventory = new List<Dictionary<string,int>>();
         }
 
