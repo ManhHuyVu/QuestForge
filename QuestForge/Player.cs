@@ -7,14 +7,35 @@ namespace QuestForge
         public string Name { get; set; }
         public int Level { get; set; }
         public int Experience { get; set; }
+        public double Attack {get; set;} // Attack point
+        public int Score { get; set; }
 
-        private List<(string, int)> inventory = new List<(string, int)>();
+        private List<Dictionary<string,int>> inventory; // List of dictionary to store item name and quantity
+        // TODO: Does this one need a description of the item as well? Maybe a separate Item class? (string for now)
 
         public Player(string name)
         {
             Name = name;
             Level = 1;
             Experience = 0;
+            inventory = new List<Dictionary<string,int>>();
+        }
+
+        public void PickupItem(string itemName, int quantity)
+        {
+            bool checkItem = false;
+            foreach (var item in inventory)
+            {
+                if (item.ContainsKey(itemName))
+                {
+                    checkItem = true;
+                    item[itemName] += quantity;
+                }
+            }
+            if (!checkItem)
+            {
+                inventory.Add(new Dictionary<string, int> { { itemName, quantity } });
+            }
         }
     }
 }
