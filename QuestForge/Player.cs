@@ -15,18 +15,16 @@ namespace QuestForge
                 base.Name = value;
             }
         }
-        public int Level { get; private set; }
-        public int Experience { get; set; }
         public double Attack {get; private set;} // Attack point
+        public double Defense {get; private set;} // Defense point
         public int Score { get; private set; }
 
         private List<Dictionary<Item,int>> inventory; // List of dictionary to store item object and quantity
 
         public Player(string namee, string descriptionAndCatchphrase) : base(namee, 'P', descriptionAndCatchphrase)
         {
-            Level = 1;
-            Experience = 0;
-            Attack = 10.0; // Starting attack point
+            Attack = 20.0; // Starting attack point
+            Defense = 10.0; // Starting defense point
             Score = 0;
             inventory = new List<Dictionary<Item,int>>();
         }
@@ -51,7 +49,7 @@ namespace QuestForge
         public override string ToString()
         {
             return $@"{base.ToString()} 
-            - Level: {Level}, Experience: {Experience}, Attack: {Attack}, Score: {Score}";
+            - Attack: {Attack}, Defense: {Defense}, Score: {Score}";
         }
     }
 }

@@ -5,7 +5,6 @@ namespace QuestForge
     public abstract class GameEntity
     {
         public virtual string Name {get; set;}
-
         private char typee;
         public char Type
         {
