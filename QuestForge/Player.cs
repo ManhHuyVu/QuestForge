@@ -2,42 +2,56 @@ using System;
 
 namespace QuestForge
 {
-    public class Player
+    public class Player: GameEntity
     {
-        public string Name { get; set; }
-        public int Level { get; set; }
-        public int Experience { get; set; }
-        public double Attack {get; set;} // Attack point
-        public int Score { get; set; }
-
-        private List<Dictionary<Item,int>> inventory; // List of dictionary to store item name and quantity
-        // TODO: Does this one need a description of the item as well? Maybe a separate Item class? (string for now)
-
-        public Player(string name)
+        public override string Name
         {
-            Name = name;
+            get { return base.Name; }
+            set{
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    throw new ArgumentException("Player name cannot be empty.");
+                }
+                base.Name = value;
+            }
+        }
+        public int Level { get; private set; }
+        public int Experience { get; set; }
+        public double Attack {get; private set;} // Attack point
+        public int Score { get; private set; }
+
+        private List<Dictionary<Item,int>> inventory; // List of dictionary to store item object and quantity
+
+        public Player(string namee, string descriptionAndCatchphrase) : base(namee, 'P', descriptionAndCatchphrase)
+        {
             Level = 1;
             Experience = 0;
             Attack = 10.0; // Starting attack point
             Score = 0;
-            inventory = new List<Dictionary<string,int>>();
+            inventory = new List<Dictionary<Item,int>>();
         }
 
-        public void PickupItem(string itemName, int quantity)
+        public void AddItemToInventory(Item itemObj, int quantity)
         {
             bool checkItem = false;
             foreach (var item in inventory)
             {
-                if (item.ContainsKey(itemName))
+                if (item.ContainsKey(itemObj))
                 {
                     checkItem = true;
-                    item[itemName] += quantity;
+                    item[itemObj] += quantity;
                 }
             }
             if (!checkItem)
             {
-                inventory.Add(new Dictionary<string, int> { { itemName, quantity } });
+                inventory.Add(new Dictionary<Item, int> { { itemObj, quantity } });
             }
+        }
+
+        public override string ToString()
+        {
+            return $@"{base.ToString()} 
+            - Level: {Level}, Experience: {Experience}, Attack: {Attack}, Score: {Score}";
         }
     }
 }
