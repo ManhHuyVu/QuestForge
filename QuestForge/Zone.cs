@@ -7,15 +7,13 @@ namespace QuestForge
         public string Name {get; private set;}
         public string Description{get; private set;}
         public char Difficulty {get; private set;} // S for Safe, E for Easy, H for Hard, B for Boss\
-        public List<GameEvent> Events {get; private set;} = new();
+        public Stack<GameEvent> Events {get; private set;} = new();
 
-        public Zone(string name, string description, char difficulty, List<GameEvent> events)
+        public Zone(string name, string description, char difficulty)
         {
             Name = name;
             Description = description;
             Difficulty = difficulty;
-            Events = events;
-            Events.Reverse();
         }   
 
         public override string ToString()

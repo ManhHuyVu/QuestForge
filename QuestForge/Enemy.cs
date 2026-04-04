@@ -5,7 +5,7 @@ namespace QuestForge
     public enum EnemyTypes { Easy, Hard, Boss }
     public class EnemyMaster
     {
-        public Enemy CreateEnemy(EnemyTypes type, string name, string description)
+        public Enemy CreateEnemy(EnemyTypes type, string name, string description) // Make enemy based on type, with name and description provided by user
         {
             switch (type)
             {

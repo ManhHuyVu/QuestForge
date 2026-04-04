@@ -2,7 +2,7 @@ using System;
 
 namespace QuestForge
 {
-    public class ItemMaster
+    public class ItemMaster // Control all item generation and management in the game, including loot drops, crafting, and inventory management
     {
         public string currentRarity { get; set; } = "R"; // default rarity for loot drops, can be changed based on game events or player actions
         
@@ -16,7 +16,7 @@ namespace QuestForge
             {new ItemQuestObject("Golden Key", "A key that opens the door to the treasure room.", 'Q', 0.1, 100.0, "The Lost Treasure"), "SR"}
         };
 
-        public Item MakeLoot()
+        public Item MakeLoot() // Generate loot based on the current rarity, using a random selection from the ItemList dictionary
         {
             Random rand = new Random();
             int index = currentRarity switch
@@ -53,7 +53,7 @@ namespace QuestForge
 
     }
 
-    public class Item: GameEntity
+    public class Item: GameEntity // Base item class, with common properties and methods for all items
     {
         private char ItemType; // 'W' for weapon, 'A' for armor, 'P' for potions, 'Q' for quest objects
         private double Weight;
@@ -73,7 +73,7 @@ namespace QuestForge
         }
     }
 
-    public class ItemWeapon : Item
+    public class ItemWeapon : Item // Weapon item class, with additional properties and methods specific to weapons
     {
         private int AttackPower;
 
@@ -89,7 +89,7 @@ namespace QuestForge
         }
     }
 
-    public class ItemArmor : Item
+    public class ItemArmor : Item // Armor item class, with additional properties and methods specific to armor
     {
         private int DefensePower;
 
@@ -105,7 +105,7 @@ namespace QuestForge
         }
     }
 
-    public class ItemPotion : Item
+    public class ItemPotion : Item // Potion item class, with additional properties and methods specific to potions
     {
         private int HealAmount;
 
@@ -121,7 +121,7 @@ namespace QuestForge
         }
     }
 
-    public class ItemQuestObject : Item
+    public class ItemQuestObject : Item // Quest object item class, with additional properties and methods specific to quest objects
     {
         private string QuestName;
 

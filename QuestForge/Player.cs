@@ -8,7 +8,7 @@ namespace QuestForge
         {
             get { return base.Name; }
             set{
-                if (string.IsNullOrWhiteSpace(value))
+                if (string.IsNullOrWhiteSpace(value)) // Validate that player name is not empty or whitespace
                 {
                     throw new ArgumentException("Player name cannot be empty.");
                 }
@@ -32,6 +32,8 @@ namespace QuestForge
             inventory = new Dictionary<Item,int>();
         }
 
+
+        // Use in GameEvent.cs in loot event to add item to player's inventory when player wins loot event
         public void AddItemToInventory(Item itemObj, int quantity)
         {
             bool checkItem = false;
@@ -66,8 +68,8 @@ namespace QuestForge
             }
             throw new ArgumentException("Item not found in inventory.");
         }
-
-        public Dictionary<Item, int> FindItemByName(string itemName)
+        
+        public Dictionary<Item, int> FindItemByName(string itemName) // Return a dictionary of items with the same name and their quantities
         {
             var result = new Dictionary<Item, int>();
             foreach (var pair in inventory)
@@ -80,7 +82,7 @@ namespace QuestForge
             return result;
         }
         
-        public bool MovePlayer(ZoneManager zm, string toZone)
+        public bool MovePlayer(ZoneManager zm, string toZone) // Move player to another zone if the move is valid according to the ZoneManager's rules
         {
             // Check if target zone exists
             Zone target = zm.GetZoneByName(toZone);

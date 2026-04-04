@@ -25,9 +25,12 @@ public class Program
         CombatEvent Gob_Am = new CombatEvent("Goblin Ambush");
         DialougeEvent StartBattle = new DialougeEvent("Goblin", "You won't get past me, Hero!");
         lootEvent Gob_Loot = new lootEvent("Goblin Loot", "R");
-        QuestForge.Zone Forest = new QuestForge.Zone("Forest", "A dense and mysterious forest filled with unknown dangers.", 'E', [StartBattle, Gob_Am, Gob_Loot]);
+        QuestForge.Zone Forest = new QuestForge.Zone("Forest", "A dense and mysterious forest filled with unknown dangers.", 'E');
         LoadEventStack(Forest.Events);
         zm.AddZone(Forest, null, null);
+        zm.PushEvent(Forest, StartBattle);
+        zm.PushEvent(Forest, Gob_Am);
+        zm.PushEvent(Forest, Gob_Loot);
         Register(Hero);
         Register(Goblin);
         Console.WriteLine(Hero.ToString());
@@ -79,7 +82,7 @@ public class Program
         return true;
     }
 
-    public static void LoadEventStack(List<GameEvent> events)
+    public static void LoadEventStack(Stack<GameEvent> events)
     {
         foreach (var gameEvent in events)
         {
