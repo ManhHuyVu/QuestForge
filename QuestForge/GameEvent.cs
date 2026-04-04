@@ -8,7 +8,8 @@ namespace QuestForge
         public Player Player { get; set; }
         public Zone Zone { get; set; }
         public Enemy Enemy { get; set; }
-        public Item Item { get; set; }
+        public ItemMaster ItemMaster { get; set; }
+        public Item ItemReturned { get; set; } // For events that return an item, such as loot events
     }
     public abstract class GameEvent
     {
@@ -24,6 +25,7 @@ namespace QuestForge
 
     public class CombatEvent : GameEvent
     {
+
         public CombatEvent(string Combat) : base(Combat){}
         
         public override void Execute(EventContext context)
@@ -58,13 +60,19 @@ namespace QuestForge
 
     public class lootEvent : GameEvent
     {
-
-        public lootEvent(string name) : base(name){}
+        public string Rarity { get; set; }
+        public lootEvent(string name, string rarity) : base(name)
+        {
+            Rarity = rarity;
+        }
 
         public override void Execute(EventContext context)
         {
-            context.Player.AddItemToInventory(context.Item.MakeLoot(), 1);
-            Console.WriteLine($"{context.Player.Name} loots {context.Item.Name}!");
+            context.ItemMaster.currentRarity = Rarity; // Set the current rarity for loot drops based on the event
+            Item loot = context.ItemMaster.MakeLoot(); // Choose an item
+            context.Player.AddItemToInventory(loot, 1);
+            context.ItemReturned = loot; // Store the returned item in the context for potential use in subsequent events
+            Console.WriteLine($"{context.Player.Name} loots {loot.Name}!");
         }
     }
 }

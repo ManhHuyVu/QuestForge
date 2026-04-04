@@ -5,19 +5,54 @@ public class Program
 {
     static List<Dictionary<int, GameEntity>> RegisteredEntities = new List<Dictionary<int, GameEntity>>();
 
+    static Stack<GameEvent> eventStack = new Stack<GameEvent>();
+
+    static QuestForge.Player Hero = new QuestForge.Player("Hero", "The brave hero of the story.");
+
+    static QuestForge.Enemy Goblin = new QuestForge.EnemyMaster().CreateEnemy(QuestForge.EnemyTypes.Easy, "Goblin", "A sneaky goblin lurking in the shadows.");
+
+    static QuestForge.EventContext BattleForest = new QuestForge.EventContext();
+
+    static QuestForge.ZoneManager zm = new QuestForge.ZoneManager();
+
+    static QuestForge.ItemMaster im = new QuestForge.ItemMaster();
     public static void Init()
     {
         // Initialize game entities, such as players, enemies, and items
-        QuestForge.Player player1 = new QuestForge.Player("Hero", "The brave hero of the story.");
-        QuestForge.Item sword = new QuestForge.Item("Sword of Destiny", "A legendary sword with immense power.", 'W', 15.0, 10.0);
-        QuestForge.Item shield = new QuestForge.Item("Shield of Valor", "A sturdy shield that can withstand powerful attacks.", 'A', 20.0, 10.0);
-        QuestForge.Item potion = new QuestForge.Item("Health Potion", "A potion that restores health.", 'P', 0.5, 5.0);
-        Console.WriteLine(player1);
+        BattleForest.Player = Hero;
+        BattleForest.Enemy = Goblin;
+        BattleForest.ItemMaster = im;
+        CombatEvent Gob_Am = new CombatEvent("Goblin Ambush");
+        DialougeEvent StartBattle = new DialougeEvent("Goblin", "You won't get past me, Hero!");
+        lootEvent Gob_Loot = new lootEvent("Goblin Loot", "R");
+        QuestForge.Zone Forest = new QuestForge.Zone("Forest", "A dense and mysterious forest filled with unknown dangers.", 'E', [StartBattle, Gob_Am, Gob_Loot]);
+        LoadEventStack(Forest.Events);
+        zm.AddZone(Forest, null, null);
+        Register(Hero);
+        Register(Goblin);
+        Console.WriteLine(Hero.ToString());
+        Console.WriteLine(Goblin.ToString());
     }
     public static void Main(string[] args)
     {
         Console.WriteLine("Welcome to QuestForge!");
-        
+        Init();
+        if (Hero.MovePlayer(zm, "Forest"))
+        {
+            Console.WriteLine($"{Hero.Name} enters the {Hero.CurrentZone.Name}.");
+            BattleForest.Zone = Hero.CurrentZone;
+            while (eventStack.Count > 0)
+            {
+                GameEvent currentEvent = eventStack.Pop();
+                currentEvent.Execute(BattleForest);
+            }
+            Console.WriteLine(Hero.ToString());
+        }
+        else
+        {
+            Console.WriteLine("Failed to move to the zone.");
+        }
+        ; // Move player to the first zone (Forest)
     }
 
     public static int Register(GameEntity entity)
@@ -34,4 +69,21 @@ public class Program
         return RegisteredEntities.Count - 1;
     }
 
+    public static bool Unregister(int id)
+    {
+        if (id < 0 || id >= RegisteredEntities.Count)
+        {
+            return false;
+        }
+        RegisteredEntities.RemoveAt(id);
+        return true;
+    }
+
+    public static void LoadEventStack(List<GameEvent> events)
+    {
+        foreach (var gameEvent in events)
+        {
+            eventStack.Push(gameEvent);
+        }
+    }
 }

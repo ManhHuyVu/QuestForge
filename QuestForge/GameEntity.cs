@@ -19,6 +19,7 @@ namespace QuestForge
             }
         }
 
+        private string descriptionAndCatchphrase;
         public string DescriptionAndCatchphrase
         {
             get;
@@ -26,20 +27,20 @@ namespace QuestForge
                 {
                     throw new ArgumentException("Description and catchphrase cannot be empty.");
                 }
-                DescriptionAndCatchphrase = value;
+                descriptionAndCatchphrase = value;
             }
         }
 
-        public GameEntity(string name, char type, string descirptionAndCatchphrase)
+        public GameEntity(string name, char type, string descirptionAndCatchphrased)
         {
             Name = name;
             Type = type;
-            DescriptionAndCatchphrase = descirptionAndCatchphrase;
+            descriptionAndCatchphrase = descirptionAndCatchphrased;
         }
 
         public override string ToString()
         {
-            return $"{Name} - {DescriptionAndCatchphrase}";
+            return $"{Name} - {descriptionAndCatchphrase}";
         }
     }
 }

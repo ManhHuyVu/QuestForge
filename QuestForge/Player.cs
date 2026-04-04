@@ -15,14 +15,17 @@ namespace QuestForge
                 base.Name = value;
             }
         }
+        public double Health { get; private set; } // Health point
         public double Attack {get; private set;} // Attack point
         public double Defense {get; private set;} // Defense point
         public int Score { get; private set; }
+        public Zone CurrentZone { get; private set; }
 
         private Dictionary<Item,int> inventory; // List of dictionary to store item object and quantity
 
         public Player(string namee, string descriptionAndCatchphrase) : base(namee, 'P', descriptionAndCatchphrase)
         {
+            Health = 100.0; // Starting health point
             Attack = 20.0; // Starting attack point
             Defense = 10.0; // Starting defense point
             Score = 0;
@@ -77,6 +80,22 @@ namespace QuestForge
             return result;
         }
         
+        public bool MovePlayer(ZoneManager zm, string toZone)
+        {
+            // Check if target zone exists
+            Zone target = zm.GetZoneByName(toZone);
+            if (target == null)
+                return false;
+
+            // Validate travel rules
+            if (!zm.CanTravel(CurrentZone, target))
+                return false;
+
+            // Move player
+            CurrentZone = target;
+            return true;
+        }
+
         public override string ToString()
         {   
             string inventoryString = "Inventory:\n";
@@ -87,7 +106,7 @@ namespace QuestForge
             return $@"{base.ToString()} 
             - Character: Player
             - Attack: {Attack}, Defense: {Defense}, Score: {Score}
-            {inventoryString}";
+            - {inventoryString}";
         }
     }
 }
