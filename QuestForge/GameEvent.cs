@@ -9,6 +9,8 @@ namespace QuestForge
         public Zone Zone { get; set; }
         public Enemy Enemy { get; set; }
         public ItemMaster ItemMaster { get; set; }
+        public CombatManager CombatManager { get; set; } // For combat events
+        public string CombatResult { get; set; } // For deciding loot drops based on combat outcome
         public Item ItemReturned { get; set; } // For events that return an item, such as loot events
     }
     public abstract class GameEvent
@@ -32,6 +34,8 @@ namespace QuestForge
         {
             // Implement combat logic here, using context.Player, context.Enemy, etc.
             Console.WriteLine($"{context.Player.Name} engages in combat with {context.Enemy.Name}!");
+            string res = context.CombatManager.PlayCombatRound(context.Player, context.Enemy); // Process combat actions
+            context.CombatResult = res; // Store the combat result in the context for use in subsequent events
         }
     }
 

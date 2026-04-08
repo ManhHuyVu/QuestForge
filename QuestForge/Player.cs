@@ -17,7 +17,7 @@ namespace QuestForge
         }
         public double Health { get; private set; } // Health point
         public double Attack {get; private set;} // Attack point
-        public double Defense {get; private set;} // Defense point
+        public double Defense {get; set;} // Defense point
         public int Score { get; private set; }
         public Zone CurrentZone { get; private set; }
 
@@ -27,12 +27,20 @@ namespace QuestForge
         {
             Health = 100.0; // Starting health point
             Attack = 20.0; // Starting attack point
-            Defense = 10.0; // Starting defense point
+            Defense = 0; // Starting defense point
             Score = 0;
             inventory = new Dictionary<Item,int>();
         }
 
-
+        public void Revive()
+        {
+            Health = 100.0; // Reset health to full
+            Attack = 20.0; // Reset attack to base value
+            Defense = 0; // Reset defense to base value
+            inventory.Clear(); // Clear inventory
+            Console.WriteLine($"{Name} has been revived with full health and a clean inventory.");
+        }
+        
         // Use in GameEvent.cs in loot event to add item to player's inventory when player wins loot event
         public void AddItemToInventory(Item itemObj, int quantity)
         {
@@ -52,6 +60,7 @@ namespace QuestForge
             }
         }
 
+        // No use in current phase
         public void RemoveItemFromInventory(Item itemObj, int quantity)
         {
             foreach (var pair in inventory)
@@ -69,6 +78,19 @@ namespace QuestForge
             throw new ArgumentException("Item not found in inventory.");
         }
         
+        // Use in CombatManager.cs to process damage taken during combat
+        public bool TakeDamage(double damage)
+        {
+            Health -= damage;
+            if (Health < 0)
+            {
+                Health = 0;
+                return true; // Enemy is defeated, == GameEnd
+            }
+            return false
+            ;
+        }
+
         public Dictionary<Item, int> FindItemByName(string itemName) // Return a dictionary of items with the same name and their quantities
         {
             var result = new Dictionary<Item, int>();
@@ -106,7 +128,7 @@ namespace QuestForge
                 inventoryString += $"Item: {pair.Key.Name}, Quantity: {pair.Value}\n";
             }
             return $@"{base.ToString()} 
-            - Character: Player
+            - Character: Player, Health: {Health}
             - Attack: {Attack}, Defense: {Defense}, Score: {Score}
             - {inventoryString}";
         }

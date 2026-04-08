@@ -16,6 +16,8 @@ namespace QuestForge
             Difficulty = difficulty;
         }   
 
+        
+
         public override string ToString()
         {
             return $@"{Name} 

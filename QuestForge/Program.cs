@@ -15,6 +15,8 @@ public class Program
 
     static QuestForge.ZoneManager zm = new QuestForge.ZoneManager();
 
+    static QuestForge.CombatManager cm = new QuestForge.CombatManager();
+
     static QuestForge.ItemMaster im = new QuestForge.ItemMaster();
     public static void Init()
     {
@@ -22,15 +24,17 @@ public class Program
         BattleForest.Player = Hero;
         BattleForest.Enemy = Goblin;
         BattleForest.ItemMaster = im;
+        BattleForest.CombatManager = cm;
         CombatEvent Gob_Am = new CombatEvent("Goblin Ambush");
         DialougeEvent StartBattle = new DialougeEvent("Goblin", "You won't get past me, Hero!");
         lootEvent Gob_Loot = new lootEvent("Goblin Loot", "R");
         QuestForge.Zone Forest = new QuestForge.Zone("Forest", "A dense and mysterious forest filled with unknown dangers.", 'E');
-        LoadEventStack(Forest.Events);
         zm.AddZone(Forest, null, null);
         zm.PushEvent(Forest, StartBattle);
         zm.PushEvent(Forest, Gob_Am);
         zm.PushEvent(Forest, Gob_Loot);
+        LoadEventStack(zm.zones.First.Value.Events); // Access zone manager -> zone linked list -> value of node (zone) -> Events of zone
+        BattleForest.Zone = zm.zones.First.Value;
         Register(Hero);
         Register(Goblin);
         Console.WriteLine(Hero.ToString());
@@ -47,6 +51,13 @@ public class Program
             while (eventStack.Count > 0)
             {
                 GameEvent currentEvent = eventStack.Pop();
+                if(BattleForest.CombatResult != "Player" && BattleForest.CombatResult != null)
+                {
+                    if(currentEvent is lootEvent)
+                    {
+                        continue; // Skip loot events if the player didn't win the combat
+                    }
+                }
                 currentEvent.Execute(BattleForest);
             }
             Console.WriteLine(Hero.ToString());

@@ -5,7 +5,7 @@ namespace QuestForge
 {
     public class ZoneManager
     {
-        public LinkedList<Zone> zones = new LinkedList<Zone>();
+        public LinkedList<Zone> zones {get; set;} = new LinkedList<Zone>();
         
         public LinkedList<Zone> AddZone(Zone zone, Zone? prevZone, Zone? nextZone) // Add a new zone to the linked list, specifying its position relative to existing zones
         {
