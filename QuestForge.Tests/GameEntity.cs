@@ -8,6 +8,19 @@ public class Player
     public QuestForge.Player otherTesting = new QuestForge.Player("Hero", "The brave hero of the story.");
 
     [Fact]
+    public void PlayerToString()
+    {
+        // Given
+    
+        // When
+        string playerString = otherTesting.ToString();
+    
+        // Then
+        Assert.Contains("Hero", playerString);
+        Assert.Contains("The brave hero of the story.", playerString);
+    }
+
+    [Fact]
     public void Player_InitWithBadName_ThrowException()
     {
         Assert.Throws<InvalidNameException>(() =>
@@ -240,6 +253,19 @@ public class Enemy
     }
 
     [Fact]
+    public void EnemyToString()
+    {
+        // Given
+        QuestForge.Enemy enemy = otherTesting.CreateEnemy(QuestForge.EnemyTypes.Easy, "Goblin", "A small and mischievous creature.");
+
+        // When
+        string enemyString = enemy.ToString();
+        // Then
+        Assert.Contains("Goblin", enemyString);
+        Assert.Contains("A small and mischievous creature.", enemyString);
+    }
+    
+    [Fact]
     public void Enemy_TakeDamage_ReturnsTrueWhenDefeated()
     {
         // Given
@@ -266,3 +292,57 @@ public class Enemy
     }
 }
 
+public class Item
+{
+    public QuestForge.ItemMaster otherTesting = new QuestForge.ItemMaster();
+
+    [Fact]
+    public void ItemMaster_MakeCorrectLoot_ReturnsValidItem()
+    {
+        // Given
+        Item itemR = otherTesting.MakeLoot();
+        otherTesting.currentRarity = "SR"; // Set rarity to Super Rare for testing
+        Item itemSR = otherTesting.MakeLoot();
+        otherTesting.currentRarity = "SSR"; // Set rarity to Super Super Rare for testing
+        Item itemSSR = otherTesting.MakeLoot();
+        // When
+    
+        // Then
+        Assert.NotNull(itemR);
+        Assert.False(string.IsNullOrWhiteSpace(itemR.Name));
+        Assert.False(string.IsNullOrWhiteSpace(itemR.Description));
+        Assert.True(itemR.Value > 0);
+        Assert.True(itemR.Weight > 0);
+        Assert.Equal(QuestForge.ItemRarities.Rare, itemR.Rarity);
+        Assert.Equal(QuestForge.ItemRarities.SuperRare, itemSR.Rarity);
+        Assert.Equal(QuestForge.ItemRarities.SuperSuperRare, itemSSR.Rarity);
+    }
+
+    [Fact]
+    public void ItemWeapon_IncreaseDamage_WhenEquipped()
+    {
+        // Given
+        QuestForge.Player player = new QuestForge.Player("Hero", "The brave hero of the story.");
+        ItemWeapon weapon = new ItemWeapon("Sword of Destiny", "A legendary sword with immense power.", 'W', 15.0, 10.0, 20);
+
+        // When
+        player.AddItemToInventory(weapon, 1);
+
+        // Then
+        Assert.Equal(40.0, player.Attack); // Player's attack should increase by weapon's attack bonus
+    }
+
+    [Fact]
+    public void ItemArmor_IncreaseDefense_WhenEquipped()
+    {
+        // Given
+        QuestForge.Player player = new QuestForge.Player("Hero", "The brave hero of the story.");
+        ItemArmor armor = new ItemArmor("Plate Armor", "A set of heavy plate armor.", 'A', 20.0, 15.0, 10);
+
+        // When
+        player.AddItemToInventory(armor, 1);
+
+        // Then
+        Assert.Equal(10, player.Defense); // Player's defense should increase by armor's defense bonus
+    }
+}

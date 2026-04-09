@@ -13,7 +13,8 @@ namespace QuestForge
             {new ItemWeapon("Sword of Destiny", "A legendary sword with immense power.", 'W', 15.0, 10.0, 20), "R"},
             {new ItemArmor("Shield of Valor", "A sturdy shield that can withstand powerful attacks.", 'A', 20.0, 10.0, 15), "R"},
             {new ItemPotion("Health Potion", "A potion that restores health.", 'P', 0.5, 5.0, 50), "R"},
-            {new ItemQuestObject("Golden Key", "A key that opens the door to the treasure room.", 'Q', 0.1, 100.0, "The Lost Treasure"), "SR"}
+            {new ItemQuestObject("Golden Key", "A key that opens the door to the treasure room.", 'Q', 0.1, 100.0, "The Lost Treasure"), "SR"},
+            {new ItemWeapon("Axe of Fury", "A powerful axe that can deal massive damage.", 'W', 20.0, 15.0, 30), "SSR"}
         };
 
         public Item MakeLoot() // Generate loot based on the current rarity, using a random selection from the ItemList dictionary
@@ -75,7 +76,7 @@ namespace QuestForge
 
     public class ItemWeapon : Item // Weapon item class, with additional properties and methods specific to weapons
     {
-        private int AttackPower;
+        public int AttackPower { get; private set; }
 
         public ItemWeapon(string name, string description, char itemType, double weight, double value, int attackPower) : base(name, description, itemType, weight, value)
         {
@@ -91,7 +92,7 @@ namespace QuestForge
 
     public class ItemArmor : Item // Armor item class, with additional properties and methods specific to armor
     {
-        private int DefensePower;
+        public int DefensePower { get; private set; }
 
         public ItemArmor(string name, string description, char itemType, double weight, double value, int defensePower) : base(name, description, itemType, weight, value)
         {

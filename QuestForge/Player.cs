@@ -51,12 +51,28 @@ namespace QuestForge
                 {
                     inventory[pair.Key] += quantity;
                     checkItem = true;
+                    if (itemObj is ItemWeapon weapon)
+                    {
+                        Attack += weapon.AttackPower; // Increase player's attack by weapon's attack bonus
+                    }
+                    else if (itemObj is ItemArmor armor)
+                    {
+                        Defense += armor.DefensePower; // Increase player's defense by armor's defense bonus    
+                    }
                     break;
                 }
             }
             if (!checkItem)
             {
                 inventory.Add(itemObj, quantity);
+                if (itemObj is ItemWeapon weapon)
+                {
+                    Attack += weapon.AttackPower; // Increase player's attack by weapon's attack bonus
+                }
+                else if (itemObj is ItemArmor armor)
+                {
+                    Defense += armor.DefensePower; // Increase player's defense by armor's defense bonus    
+                }
             }
         }
 
@@ -68,7 +84,7 @@ namespace QuestForge
                 if (pair.Key == itemObj)
                 {
                     inventory[pair.Key] -= quantity;
-                    if (inventory[pair.Key] == 0)
+                    if (inventory[pair.Key] <= 0)
                     {
                         inventory.Remove(pair.Key);
                     }
@@ -85,7 +101,7 @@ namespace QuestForge
             if (Health < 0)
             {
                 Health = 0;
-                return true; // Enemy is defeated, == GameEnd
+                return true; // Player is defeated, == GameEnd
             }
             return false
             ;
