@@ -34,7 +34,6 @@ public class Program
         zm.PushEvent(Forest, Gob_Am);
         zm.PushEvent(Forest, Gob_Loot);
         LoadEventStack(zm.zones.First.Value.Events); // Access zone manager -> zone linked list -> value of node (zone) -> Events of zone
-        BattleForest.Zone = zm.zones.First.Value;
         Register(Hero);
         Register(Goblin);
         Console.WriteLine(Hero.ToString());
@@ -47,7 +46,6 @@ public class Program
         if (Hero.MovePlayer(zm, "Forest"))
         {
             Console.WriteLine($"{Hero.Name} enters the {Hero.CurrentZone.Name}.");
-            BattleForest.Zone = Hero.CurrentZone;
             while (eventStack.Count > 0)
             {
                 GameEvent currentEvent = eventStack.Pop();

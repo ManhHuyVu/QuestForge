@@ -6,7 +6,6 @@ namespace QuestForge
     public class EventContext// Context class to hold relevant information for events
     {
         public Player Player { get; set; }
-        public Zone Zone { get; set; }
         public Enemy Enemy { get; set; }
         public ItemMaster ItemMaster { get; set; }
         public CombatManager CombatManager { get; set; } // For combat events
