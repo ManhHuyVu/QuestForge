@@ -5,7 +5,7 @@ using Xunit;
 
 namespace QuestForge.Tests;
 
-public class GameEnvironmentTests
+public class ZoneTests
 {
     public ZoneManager zoneMaster = new ZoneManager();
 
@@ -177,5 +177,72 @@ public class GameEnvironmentTests
         // Then
         Assert.Contains("Town (S)", display);
         Assert.Contains("Forest (E)", display);
+    }
+
+    [Fact]
+    public void ZoneToString_ReturnsCorrectString()
+    {
+        // Given
+        Zone Town = new QuestForge.Zone("Town", "A peaceful town with friendly inhabitants.", 'S');
+
+        // When
+        string zoneString = Town.ToString();
+
+        // Then
+        Assert.Contains("Town", zoneString);
+        Assert.Contains("A peaceful town with friendly inhabitants.", zoneString);
+        Assert.Contains("S", zoneString);
+    }
+}
+
+public class GameEventTests
+{
+    public EventContext context = new EventContext();
+
+    [Fact]
+    public void DialougeEvent_Execute_PrintsCorrectDialogue()
+    {
+        // Given
+        QuestForge.Player player = new QuestForge.Player("Hero", "A brave adventurer.");
+        context.Player = player;
+        DialougeEvent dialogueEvent = new DialougeEvent("Greeting", "Welcome to the town!");
+
+        // When
+        dialogueEvent.Execute(context);
+    }
+
+    [Fact]
+    public void CombatEvent_Execute_PrintsCombatResult()
+    {
+        // Given
+        QuestForge.Player player = new QuestForge.Player("Hero", "A brave adventurer.");
+        QuestForge.Enemy enemy = new QuestForge.Enemy("Goblin", "A sneaky goblin.", 30, 5);
+        CombatManager combatManager = new CombatManager();
+        context.Player = player;
+        context.Enemy = enemy;
+        context.CombatManager = combatManager;
+        CombatEvent combatEvent = new CombatEvent("Combat");
+
+        // When
+        combatEvent.Execute(context);
+
+        // Then
+        Assert.NotNull(context.CombatResult);
+    }
+
+    [Fact]
+    public void LootEvent_Execute_PutItemInInventory()
+    {
+        // Given
+        QuestForge.Player player = new QuestForge.Player("Hero", "A brave adventurer.");
+        context.Player = player;
+        QuestForge.LootEvent lootEvent = new QuestForge.LootEvent("Loot", "SR");
+
+        // When
+        lootEvent.Execute(context);
+        Dictionary<QuestForge.Item, int> itemInIventory = context.Player.FindItemByName(context.ItemReturned.Name);
+
+        // Then
+        Assert.Single(itemInIventory);
     }
 }
