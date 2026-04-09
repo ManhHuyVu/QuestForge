@@ -22,7 +22,7 @@ namespace QuestForge
         private string descriptionAndCatchphrase; 
         public string DescriptionAndCatchphrase // Catchphrase for player and enemy, description for item
         {
-            get;
+            get { return descriptionAndCatchphrase; }
             set {if (string.IsNullOrWhiteSpace(value))
                 {
                     throw new ArgumentException("Description and catchphrase cannot be empty.");

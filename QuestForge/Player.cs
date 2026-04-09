@@ -19,9 +19,9 @@ namespace QuestForge
         public double Attack {get; private set;} // Attack point
         public double Defense {get; set;} // Defense point
         public int Score { get; private set; }
-        public Zone CurrentZone { get; private set; }
+        public Zone CurrentZone { get; private set; } = null; // Player's current location in the game world, initialized to null
 
-        private Dictionary<Item,int> inventory; // List of dictionary to store item object and quantity
+        public Dictionary<Item,int> inventory { get; private set; } // List of dictionary to store item object and quantity
 
         public Player(string namee, string descriptionAndCatchphrase) : base(namee, 'P', descriptionAndCatchphrase)
         {

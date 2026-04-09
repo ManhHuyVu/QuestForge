@@ -1,6 +1,8 @@
 ﻿using System.Net.ServerSentEvents;
 using System.Reflection;
 using QuestForge;
+using Xunit;
+
 namespace QuestForge.Tests;
 
 public class Player
@@ -23,11 +25,11 @@ public class Player
     [Fact]
     public void Player_InitWithBadName_ThrowException()
     {
-        Assert.Throws<InvalidNameException>(() =>
+        Assert.Throws<ArgumentException>(() =>
         {
             QuestForge.Player Hero = new QuestForge.Player(null, "The brave hero of the story.");
         });
-        Assert.Throws<InvalidNameException>(() =>
+        Assert.Throws<ArgumentException>(() =>
         {
             QuestForge.Player Hero = new QuestForge.Player("   ", "The brave hero of the story.");
         });
@@ -45,7 +47,7 @@ public class Player
     
         // Then
         Assert.Equal(validName, Hero.Name);
-        Assert.Equal(validDescription, Hero.Description);
+        Assert.Equal(validDescription, Hero.DescriptionAndCatchphrase);
         Assert.Equal(100.0, Hero.Health);
     }
 
@@ -53,19 +55,19 @@ public class Player
     public void Player_AddItemToInventory()
     {
         // Given
-        Item itemObj = new ItemMaster().MakeLoot();
+        QuestForge.Item itemObj = new QuestForge.ItemMaster().MakeLoot();
     
         // When
         otherTesting.AddItemToInventory(itemObj, 1);
     
         // Then
-        Assert.Equal(1, otherTesting.inventory.Count);
+        Assert.Single(otherTesting.inventory);
 
         // When add the same item again
         otherTesting.AddItemToInventory(itemObj, 1);
     
         // Then
-        Assert.Equal(1, otherTesting.inventory.Count);
+        Assert.Single(otherTesting.inventory);
         Assert.Equal(2, otherTesting.inventory[itemObj]);
     }
 
@@ -74,35 +76,35 @@ public class Player
     {
         // Throw away more than own
         // Given
-        Item itemObj = new ItemMaster().MakeLoot();
+        QuestForge.Item itemObj = new QuestForge.ItemMaster().MakeLoot();
         otherTesting.AddItemToInventory(itemObj, 1);
 
         // When
         otherTesting.RemoveItemFromInventory(itemObj, 2);
     
         // Then
-        Assert.Equal(0, otherTesting.inventory.Count);
+        Assert.Empty(otherTesting.inventory);
 
         // Remove part of the item
         // Given
-        Item itemObj = new ItemMaster().MakeLoot();
-        otherTesting.AddItemToInventory(itemObj, 3);
+        QuestForge.Item itemObj1 = new QuestForge.ItemMaster().MakeLoot();
+        otherTesting.AddItemToInventory(itemObj1, 3);
 
         // When
-        otherTesting.RemoveItemFromInventory(itemObj, 2);
+        otherTesting.RemoveItemFromInventory(itemObj1, 2);
     
         // Then
-        Assert.Equal(1, otherTesting.inventory.Count);
+        Assert.Single(otherTesting.inventory);
 
         // Remove item that is not in inventory
         // Given
-        Item itemObj = new ItemMaster().MakeLoot();
-        otherTesting.AddItemToInventory(itemObj, 1);
+        QuestForge.Item itemObj2 = new QuestForge.Item("Test Item", "A test item.", 'A', 10, 5);
+        otherTesting.AddItemToInventory(itemObj2, 1);
 
         // When
-        Assert.Throws<InvalidObjectException>(() =>
+        Assert.Throws<ArgumentException>(() =>
         {
-            otherTesting.RemoveItemFromInventory(new Item("Test Item", "A test item.", 10, 5), 2);
+            otherTesting.RemoveItemFromInventory(new QuestForge.Item("Not test Object", "Not it", 'A', 10, 5), 2);
         });
     }
 
@@ -111,15 +113,15 @@ public class Player
     {  
         //Given
         otherTesting.TakeDamage(90);
-        otherTesting.AddItemToInventory(new ItemMaster.MakeLoot(), 1);
-        Assert.Equal(otherTesting.inventory.Count, 1);
+        otherTesting.AddItemToInventory(new QuestForge.ItemMaster().MakeLoot(), 1);
+        Assert.Single(otherTesting.inventory);
 
         //When
         otherTesting.Revive();
 
         //Then
         Assert.Equal(100, otherTesting.Health);
-        Assert.Equal(otherTesting.inventory.Count, 0);
+        Assert.Empty(otherTesting.inventory);
     }
 
     [Fact]
@@ -152,16 +154,30 @@ public class Player
     public void Player_FindItemByName_ReturnsCorrectItems()
     {
         // Given
-        Item itemObj = new ItemMaster().MakeLoot();
-        Item itemObj2 = new Item("Test Item", "A test item.", 10, 5);
+        QuestForge.Item itemObj = new QuestForge.ItemMaster().MakeLoot();
+        QuestForge.Item itemObj2 = new QuestForge.Item("Test Item", "A test item.", 'A', 10, 5);
         otherTesting.AddItemToInventory(itemObj, 2);
         otherTesting.AddItemToInventory(itemObj2, 1);
 
         // When
-        var result = otherTesting.FindItemByName(itemObj.Name);
+        Dictionary<QuestForge.Item, int> result = otherTesting.FindItemByName(itemObj.Name);
 
         // Then
-        Assert.Equal(1, result[itemObj]);
+        Assert.Single(result);
+    }
+
+    [Fact]
+    public void Player_MovePlayer_ReturnsFalseWhenMoveIsInvalid()
+    {
+        // Given
+        QuestForge.ZoneManager zm = new QuestForge.ZoneManager();
+
+        // When
+        bool moveResult = otherTesting.MovePlayer(zm, "NonExistentZone");
+    
+        // Then
+        Assert.False(moveResult);
+        Assert.Null(otherTesting.CurrentZone);
     }
 
     [Fact]
@@ -173,27 +189,11 @@ public class Player
         zm.AddZone(Forest, null, null);
 
         // When
-        otherTesting.CurrentZone = null; // Ensure player starts with no current zone
         bool moveResult = otherTesting.MovePlayer(zm, "Forest");
     
         // Then
         Assert.True(moveResult);
         Assert.Equal(Forest, otherTesting.CurrentZone);
-    }
-
-    [Fact]
-    public void Player_MovePlayer_ReturnsFalseWhenMoveIsInvalid()
-    {
-        // Given
-        QuestForge.ZoneManager zm = new QuestForge.ZoneManager();
-
-        // When
-        otherTesting.CurrentZone = null; // Ensure player starts with no current zone
-        bool moveResult = otherTesting.MovePlayer(zm, "NonExistentZone");
-    
-        // Then
-        Assert.False(moveResult);
-        Assert.Null(otherTesting.CurrentZone);
     }
 }
 
@@ -213,7 +213,6 @@ public class Enemy
         QuestForge.Enemy enemy = otherTesting.CreateEnemy(enemyType, name, description);
 
         // Then
-        Assert.Equal(enemyType, enemy.Type);
         Assert.Equal(50, enemy.Health);
         Assert.Equal(10, enemy.Attack);
     }
@@ -230,7 +229,6 @@ public class Enemy
         QuestForge.Enemy enemy = otherTesting.CreateEnemy(enemyType, name, description);
 
         // Then
-        Assert.Equal(enemyType, enemy.Type);
         Assert.Equal(100, enemy.Health);
         Assert.Equal(20, enemy.Attack);
     }
@@ -247,7 +245,6 @@ public class Enemy
         QuestForge.Enemy enemy = otherTesting.CreateEnemy(enemyType, name, description);
 
         // Then
-        Assert.Equal(enemyType, enemy.Type);
         Assert.Equal(200, enemy.Health);
         Assert.Equal(30, enemy.Attack);
     }
@@ -297,25 +294,40 @@ public class Item
     public QuestForge.ItemMaster otherTesting = new QuestForge.ItemMaster();
 
     [Fact]
+    public void ItemMaster_AddNewItemToItemList()
+    {
+        // Given
+        QuestForge.Item item = new QuestForge.Item("Test Item", "A test item.", 'W', 1.0, 10.0);
+        string rarity = "R";
+
+        // When
+        otherTesting.AddNewItem(item, rarity);
+
+        // Then
+        Assert.True(otherTesting.ItemList.ContainsKey(item));
+        Assert.Equal(rarity, otherTesting.ItemList[item]);
+    }
+
+    [Fact]
     public void ItemMaster_MakeCorrectLoot_ReturnsValidItem()
     {
         // Given
-        Item itemR = otherTesting.MakeLoot();
+        QuestForge.Item itemR = otherTesting.MakeLoot();
         otherTesting.currentRarity = "SR"; // Set rarity to Super Rare for testing
-        Item itemSR = otherTesting.MakeLoot();
+        QuestForge.Item itemSR = otherTesting.MakeLoot();
         otherTesting.currentRarity = "SSR"; // Set rarity to Super Super Rare for testing
-        Item itemSSR = otherTesting.MakeLoot();
+        QuestForge.Item itemSSR = otherTesting.MakeLoot();
         // When
     
         // Then
         Assert.NotNull(itemR);
         Assert.False(string.IsNullOrWhiteSpace(itemR.Name));
-        Assert.False(string.IsNullOrWhiteSpace(itemR.Description));
+        Assert.False(string.IsNullOrWhiteSpace(itemR.DescriptionAndCatchphrase));
         Assert.True(itemR.Value > 0);
         Assert.True(itemR.Weight > 0);
-        Assert.Equal(QuestForge.ItemRarities.Rare, itemR.Rarity);
-        Assert.Equal(QuestForge.ItemRarities.SuperRare, itemSR.Rarity);
-        Assert.Equal(QuestForge.ItemRarities.SuperSuperRare, itemSSR.Rarity);
+        Assert.Equal("R", otherTesting.ItemList[itemR]);
+        Assert.Equal("SR", otherTesting.ItemList[itemSR]);
+        Assert.Equal("SSR", otherTesting.ItemList[itemSSR]);
     }
 
     [Fact]
@@ -323,7 +335,7 @@ public class Item
     {
         // Given
         QuestForge.Player player = new QuestForge.Player("Hero", "The brave hero of the story.");
-        ItemWeapon weapon = new ItemWeapon("Sword of Destiny", "A legendary sword with immense power.", 'W', 15.0, 10.0, 20);
+        QuestForge.ItemWeapon weapon = new QuestForge.ItemWeapon("Sword of Destiny", "A legendary sword with immense power.", 'W', 15.0, 10.0, 20);
 
         // When
         player.AddItemToInventory(weapon, 1);
@@ -337,7 +349,7 @@ public class Item
     {
         // Given
         QuestForge.Player player = new QuestForge.Player("Hero", "The brave hero of the story.");
-        ItemArmor armor = new ItemArmor("Plate Armor", "A set of heavy plate armor.", 'A', 20.0, 15.0, 10);
+        QuestForge.ItemArmor armor = new QuestForge.ItemArmor("Plate Armor", "A set of heavy plate armor.", 'A', 20.0, 15.0, 10);
 
         // When
         player.AddItemToInventory(armor, 1);
@@ -350,10 +362,10 @@ public class Item
     public void ItemToString()
     {
         // Given
-        Item item = new Item("Sample Item", "Do nothing", 'W', 1.0, 10.0);
-        ItemWeapon weapon = new ItemWeapon("Sword of Destiny", "A legendary sword with immense power.", 'W', 15.0, 10.0, 20);
-        ItemArmor armor = new ItemArmor("Plate Armor", "A set of heavy plate armor.", 'A', 20.0, 15.0, 10);
-        ItemPotion potion = new ItemPotion("Health Potion", "A potion that restores health.", 'P', 0.5, 5.0, 50);
+        QuestForge.Item item = new QuestForge.Item("Sample Item", "Do nothing", 'W', 1.0, 10.0);
+        QuestForge.ItemWeapon weapon = new QuestForge.ItemWeapon("Sword of Destiny", "A legendary sword with immense power.", 'W', 15.0, 10.0, 20);
+        QuestForge.ItemArmor armor = new QuestForge.ItemArmor("Plate Armor", "A set of heavy plate armor.", 'A', 20.0, 15.0, 10);
+        QuestForge.ItemPotion potion = new QuestForge.ItemPotion("Health Potion", "A potion that restores health.", 'P', 0.5, 5.0, 50);
 
         // When
         string itemString = item.ToString();

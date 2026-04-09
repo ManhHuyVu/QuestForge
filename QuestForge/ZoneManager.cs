@@ -37,6 +37,7 @@ namespace QuestForge
                 zone.Events.Pop();
             }
         }
+        
         public bool PushEvent(Zone zone, GameEvent gameEvent)
         {
             if (!zones.Contains(zone))
