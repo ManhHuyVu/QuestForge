@@ -1,11 +1,10 @@
 ﻿using System;
+using System.Diagnostics.Tracing;
 using QuestForge;
 
 public class Program
 {
-    static List<Dictionary<int, GameEntity>> RegisteredEntities = new List<Dictionary<int, GameEntity>>();
-
-    static Stack<GameEvent> eventStack = new Stack<GameEvent>();
+    static GameMaster gm = new GameMaster();
 
     static QuestForge.Player Hero = new QuestForge.Player("Hero", "The brave hero of the story.");
 
@@ -33,9 +32,8 @@ public class Program
         zm.PushEvent(Forest, StartBattle);
         zm.PushEvent(Forest, Gob_Am);
         zm.PushEvent(Forest, Gob_Loot);
-        LoadEventStack(zm.zones.First.Value.Events); // Access zone manager -> zone linked list -> value of node (zone) -> Events of zone
-        Register(Hero);
-        Register(Goblin);
+        gm.Register(Hero);
+        gm.Register(Goblin);
         Console.WriteLine(Hero.ToString());
         Console.WriteLine(Goblin.ToString());
     }
@@ -46,6 +44,7 @@ public class Program
         if (Hero.MovePlayer(zm, "Forest"))
         {
             Console.WriteLine($"{Hero.Name} enters the {Hero.CurrentZone.Name}.");
+            Stack<GameEvent> eventStack = new Stack<GameEvent>(Hero.CurrentZone.Events);
             while (eventStack.Count > 0)
             {
                 GameEvent currentEvent = eventStack.Pop();
@@ -66,8 +65,12 @@ public class Program
         }
         ; // Move player to the first zone (Forest)
     }
+}
 
-    public static int Register(GameEntity entity)
+public class GameMaster
+{
+    static List<Dictionary<int, GameEntity>> RegisteredEntities = new List<Dictionary<int, GameEntity>>();
+    public int Register(GameEntity entity)
     {
         int index = RegisteredEntities.FindIndex(e => e.ContainsValue(entity));
         if (index != -1)
@@ -81,7 +84,7 @@ public class Program
         return RegisteredEntities.Count - 1;
     }
 
-    public static bool Unregister(int id)
+    public bool Unregister(int id)
     {
         if (id < 0 || id >= RegisteredEntities.Count)
         {
@@ -91,11 +94,5 @@ public class Program
         return true;
     }
 
-    public static void LoadEventStack(Stack<GameEvent> events)
-    {
-        foreach (var gameEvent in events)
-        {
-            eventStack.Push(gameEvent);
-        }
-    }
+
 }

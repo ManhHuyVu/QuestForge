@@ -122,7 +122,6 @@ namespace QuestForge
                         if (GameEnd)
                         {
                             Result = action.Source == player ? "Player" : "Enemy";
-                            Console.WriteLine(Result);
                         }
                     }
                     else if (action.ActionType == CombatActionType.Defend)
@@ -166,6 +165,7 @@ namespace QuestForge
                                 Console.WriteLine("Enemy failed to flee!");
                             }
                         }
+                        Console.WriteLine();
                     }
                 }
             } 
