@@ -62,10 +62,10 @@ namespace QuestForge
         }
     }
 
-    public class lootEvent : GameEvent
+    public class LootEvent : GameEvent
     {
         public string Rarity { get; set; }
-        public lootEvent(string name, string rarity) : base(name)
+        public LootEvent(string name, string rarity) : base(name)
         {
             Rarity = rarity;
         }

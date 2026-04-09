@@ -27,7 +27,7 @@ public class Program
         BattleForest.CombatManager = cm;
         CombatEvent Gob_Am = new CombatEvent("Goblin Ambush");
         DialougeEvent StartBattle = new DialougeEvent("Goblin", "You won't get past me, Hero!");
-        lootEvent Gob_Loot = new lootEvent("Goblin Loot", "R");
+        LootEvent Gob_Loot = new LootEvent("Goblin Loot", "R");
         QuestForge.Zone Forest = new QuestForge.Zone("Forest", "A dense and mysterious forest filled with unknown dangers.", 'E');
         zm.AddZone(Forest, null, null);
         zm.PushEvent(Forest, StartBattle);
@@ -53,7 +53,7 @@ public class Program
                 GameEvent currentEvent = eventStack.Pop();
                 if(BattleForest.CombatResult != "Player" && BattleForest.CombatResult != null)
                 {
-                    if(currentEvent is lootEvent)
+                    if(currentEvent is LootEvent)
                     {
                         continue; // Skip loot events if the player didn't win the combat
                     }
