@@ -313,9 +313,9 @@ public class Item
     {
         // Given
         QuestForge.Item itemR = otherTesting.MakeLoot();
-        otherTesting.currentRarity = "SR"; // Set rarity to Super Rare for testing
+        otherTesting.currentRarity = ItemMaster.Rarities.SR; // Set rarity to Super Rare for testing
         QuestForge.Item itemSR = otherTesting.MakeLoot();
-        otherTesting.currentRarity = "SSR"; // Set rarity to Super Super Rare for testing
+        otherTesting.currentRarity = ItemMaster.Rarities.SSR; // Set rarity to Super Super Rare for testing
         QuestForge.Item itemSSR = otherTesting.MakeLoot();
         // When
     

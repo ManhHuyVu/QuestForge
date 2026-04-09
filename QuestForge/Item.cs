@@ -4,9 +4,9 @@ namespace QuestForge
 {
     public class ItemMaster // Control all item generation and management in the game, including loot drops, crafting, and inventory management
     {
-        public string currentRarity { get; set; } = "R"; // default rarity for loot drops, can be changed based on game events or player actions
+        public Rarities currentRarity { get; set; } // default rarity for loot drops, can be changed based on game events or player actions
         
-        private enum Rarities { R, SR, SSR }; // R for Rare, SR for Super Rare, SSR for Super Super Rare
+        public enum Rarities { R, SR, SSR }; // R for Rare, SR for Super Rare, SSR for Super Super Rare
 
         public Dictionary<Item, string> ItemList {get; private set;} = new Dictionary<Item, string>() // dictionary of items and their rarities
         {
@@ -32,35 +32,23 @@ namespace QuestForge
 
         public Item MakeLoot() // Generate loot based on the current rarity, using a random selection from the ItemList dictionary
         {
-            Random rand = new Random();
-            int index = currentRarity switch
-            {
-                "R" => 1,
-                "SR" => 2,
-                "SSR" => 3,
-                _ => 0
-            };
-            if(index == 0)
-            {
-                index = rand.Next(1, 3);
-            }
             Dictionary<Item, string> RaritiesDrawn = new Dictionary<Item, string>();
             foreach(var pair in ItemList)
             {
-                if (pair.Value == Rarities.R.ToString() && index == 1)
+                if (pair.Value == currentRarity.ToString())
                 {
                     RaritiesDrawn.Add(pair.Key, pair.Value);
                 }
-                else if (pair.Value == Rarities.SR.ToString() && index == 2)
+                else if (pair.Value == currentRarity.ToString())
                 {
                     RaritiesDrawn.Add(pair.Key, pair.Value);
                 }
-                else if (pair.Value == Rarities.SSR.ToString() && index == 3)
+                else if (pair.Value == currentRarity.ToString())
                 {
                     RaritiesDrawn.Add(pair.Key, pair.Value);
                 }
             }
-            index = rand.Next(0, RaritiesDrawn.Count - 1);
+            int index = new Random().Next(0, RaritiesDrawn.Count - 1);
             return RaritiesDrawn.ElementAt(index).Key
             ;
         }

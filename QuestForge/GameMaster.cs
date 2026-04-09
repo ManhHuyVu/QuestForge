@@ -26,7 +26,7 @@ public class Program
         BattleForest.CombatManager = cm;
         CombatEvent Gob_Am = new CombatEvent("Goblin Ambush");
         DialougeEvent StartBattle = new DialougeEvent("Goblin", "You won't get past me, Hero!");
-        LootEvent Gob_Loot = new LootEvent("Goblin Loot", "R");
+        LootEvent Gob_Loot = new LootEvent("Goblin Loot", ItemMaster.Rarities.R);
         QuestForge.Zone Forest = new QuestForge.Zone("Forest", "A dense and mysterious forest filled with unknown dangers.", 'E');
         zm.AddZone(Forest, null, null);
         zm.PushEvent(Forest, StartBattle);
@@ -69,30 +69,45 @@ public class Program
 
 public class GameMaster
 {
-    static List<Dictionary<int, GameEntity>> RegisteredEntities = new List<Dictionary<int, GameEntity>>();
+    public Dictionary<GameEntity,int> RegisteredEntities {get; private set;} = new Dictionary<GameEntity,int>();
     public int Register(GameEntity entity)
     {
-        int index = RegisteredEntities.FindIndex(e => e.ContainsValue(entity));
+        int index = -1;
+        foreach (var kvp in RegisteredEntities)
+        {
+            if (kvp.Key == entity)
+            {
+                index = kvp.Value;
+            }
+        }
         if (index != -1)
         {
             return index;
         }
 
-        var newDict = new Dictionary<int, GameEntity>();
-        newDict.Add(RegisteredEntities.Count, entity);
-        RegisteredEntities.Add(newDict);
-        return RegisteredEntities.Count - 1;
+        RegisteredEntities.Add(entity, RegisteredEntities.Count);
+        return RegisteredEntities[entity];
     }
 
     public bool Unregister(int id)
     {
-        if (id < 0 || id >= RegisteredEntities.Count)
+        foreach (var kvp in RegisteredEntities)
         {
-            return false;
+            if (kvp.Value == id)
+            {
+                RegisteredEntities.Remove(kvp.Key);
+                return true;
+            }
         }
-        RegisteredEntities.RemoveAt(id);
-        return true;
+        return false;
     }
 
-
+    public GameEvent? PeekNextEvent(Zone zone)
+    {
+        if (zone.Events.Count > 0)
+        {
+            return zone.Events.Peek();
+        }
+        return null;
+    }
 }
