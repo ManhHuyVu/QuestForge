@@ -16,9 +16,6 @@
 
   <ItemGroup>
     <Using Include="Xunit" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\QuestForge\QuestForge.csproj" />
   </ItemGroup>
 
