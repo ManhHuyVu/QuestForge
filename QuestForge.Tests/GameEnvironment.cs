@@ -73,4 +73,109 @@ public class GameEnvironmentTests
         Assert.Equal(Forest, zoneMaster.zones.First.Next.Value);
     }
 
+    [Fact]
+    public void ZoneManager_PushEventIntoAvailableZone_ReturnTrue()
+    {
+        // Given
+        Zone Town = new QuestForge.Zone("Town", "A peaceful town with friendly inhabitants.", 'S');
+        zoneMaster.AddZone(Town, null, null);
+
+        // When
+        Assert.True(zoneMaster.PushEvent(Town, new QuestForge.DialougeEvent("A stranger arrives in town.", "A mysterious figure has entered the town square.")));
+
+        // Then
+        Assert.Single(zoneMaster.zones.First.Value.Events);
+    }
+
+    [Fact]
+    public void ZoneManager_PushEventIntoUnavailableZone_ReturnFalse()
+    {
+        // Given
+        Zone Town = new QuestForge.Zone("Town", "A peaceful town with friendly inhabitants.", 'S');
+
+        // When
+        var result = zoneMaster.PushEvent(Town, new QuestForge.DialougeEvent("A stranger arrives in town.", "A mysterious figure has entered the town square."));
+
+        // Then
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void ZoneManager_PopNextAvaliableEvent_ReturnsCorrectEvent()
+    {
+        // Given
+        Zone Town = new QuestForge.Zone("Town", "A peaceful town with friendly inhabitants.", 'S');
+        zoneMaster.AddZone(Town, null, null);
+        zoneMaster.PushEvent(Town, new QuestForge.DialougeEvent("A stranger arrives in town.", "A mysterious figure has entered the town square."));
+
+        // When
+        QuestForge.GameEvent? nextEvent = zoneMaster.PopNextEvent(Town);
+        // Then
+        Assert.IsAssignableFrom<QuestForge.GameEvent>(nextEvent);
+    }
+
+    [Fact]
+    public void ZoneManager_PopNextUnavailableEvent_ReturnsNull()
+    {
+        // Given
+        Zone Town = new QuestForge.Zone("Town", "A peaceful town with friendly inhabitants.", 'S');
+
+        // When
+        QuestForge.GameEvent? nextEvent = zoneMaster.PopNextEvent(Town);
+
+        // Then
+        Assert.Null(nextEvent);
+
+        //Given
+        zoneMaster.AddZone(Town, null, null);
+
+        // When
+        nextEvent = zoneMaster.PopNextEvent(Town);
+
+        // Then
+        Assert.Null(nextEvent);
+    }
+
+    [Fact]
+    public void ZoneManager_GetAvailiableZoneByName_ReturnZone()
+    {
+        // Given
+        Zone Town = new QuestForge.Zone("Town", "A peaceful town with friendly inhabitants.", 'S');
+        zoneMaster.AddZone(Town, null, null);
+
+        // When
+        Zone? foundZone = zoneMaster.GetZoneByName("Town");    
+        // Then
+        Assert.Equal(Town, foundZone);
+    }
+
+    [Fact]
+    public void ZoneManager_GetUnavailableZoneByName_ReturnsNull()
+    {
+        // Given
+        Zone Town = new QuestForge.Zone("Town", "A peaceful town with friendly inhabitants.", 'S');
+        zoneMaster.AddZone(Town, null, null);
+
+        // When
+        Zone? foundZone = zoneMaster.GetZoneByName("Forest");
+
+        // Then
+        Assert.Null(foundZone);
+    }
+
+    public void ZoneManager_DisplayZones_ReturnsCorrectString()
+    {
+        // Given
+        Zone Town = new QuestForge.Zone("Town", "A peaceful town with friendly inhabitants.", 'S');
+        Zone Forest = new QuestForge.Zone("Forest", "A dense forest filled with dangerous creatures.", 'E');
+        zoneMaster.AddZone(Town, null, null);
+        zoneMaster.AddZone(Forest, Town, null);
+
+        // When
+        string display = zoneMaster.DisplayZones();
+
+        // Then
+        Assert.Contains("Town (S)", display);
+        Assert.Contains("Forest (E)", display);
+    }
 }

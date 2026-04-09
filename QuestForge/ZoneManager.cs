@@ -30,26 +30,27 @@ namespace QuestForge
             return zones;
         }
 
-        public void PopNextEvent(Zone zone)
+        public GameEvent? PopNextEvent(Zone zone)
         {
-            if (zones.Contains(zone) && zone.Events.Count > 0)
+            if (zones.Contains(zone) && zones.Find(zone).Value.Events.Count > 0)
             {
-                zone.Events.Pop();
+                return zones.Find(zone).Value.Events.Pop();
             }
+            return null;
         }
         
         public bool PushEvent(Zone zone, GameEvent gameEvent)
         {
             if (!zones.Contains(zone))
                 return false;
-            zone.Events.Push(gameEvent);
+            zones.Find(zone).Value.Events.Push(gameEvent);
             return true;
         }
-        public Zone GetZoneByName(string name) // Retrieve a zone by its name, which can be used for navigation and event triggering
+        public Zone? GetZoneByName(string name) // Retrieve a zone by its name, which can be used for navigation and event triggering
         {
             foreach (var zone in zones)
                 if (zone.Name == name)
-                    return zone;
+                    return zone; // Return zones node if found, otherwise return null
             return null;
         }
         public bool CanTravel(Zone from, Zone to) // Implement logic to determine if the player can travel from one zone to another, based on the structure of the linked list and any additional rules (e.g., difficulty restrictions)
