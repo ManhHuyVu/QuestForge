@@ -8,7 +8,7 @@ public class Player
     public QuestForge.Player otherTesting = new QuestForge.Player("Hero", "The brave hero of the story.");
 
     [Fact]
-    public void PlayerInitWithBadName_ThrowExemption()
+    public void Player_InitWithBadName_ThrowException()
     {
         Assert.Throws<InvalidNameException>(() =>
         {
@@ -21,7 +21,7 @@ public class Player
     }
 
     [Fact]
-    public void PlayerInitWithGoodName_ReturnsValidPlayer()
+    public void Player_InitWithGoodName_ReturnsValidPlayer()
     {
         // Given
         string validName = "Hero";
@@ -37,7 +37,7 @@ public class Player
     }
 
     [Fact]
-    public void PlayerAddItemInInventory()
+    public void Player_AddItemToInventory()
     {
         // Given
         Item itemObj = new ItemMaster().MakeLoot();
@@ -57,7 +57,7 @@ public class Player
     }
 
     [Fact]
-    public void PlayerRemoveItemInInventory()
+    public void Player_RemoveItemFromInventory()
     {
         // Throw away more than own
         // Given
@@ -94,7 +94,7 @@ public class Player
     }
 
     [Fact]
-    public void PlayerRevive_ReturnOriginalStat()
+    public void Player_Revive_ReturnOriginalStat()
     {  
         //Given
         otherTesting.TakeDamage(90);
@@ -110,20 +110,33 @@ public class Player
     }
 
     [Fact]
-    public void PlayerTakeDamage_ReturnsTrueWhenDefeated()
+    public void Player_TakeDamage_ReturnsTrueWhenDefeated()
     {
         // Given
-        otherTesting.TakeDamage(110); // More damage than health
+        int damage = 110; // More damage than health
 
         // When
     
         // Then
-        Assert.True(otherTesting.TakeDamage(110));
+        Assert.True(otherTesting.TakeDamage(damage)); // True because player is defeated
         otherTesting.Revive();
     }
 
     [Fact]
-    public void PlayerFindItemByName_ReturnsCorrectItems()
+    public void Player_TakeDamage_ReturnsFalseWhenNotDefeated()
+    {
+        // Given
+        int damage = 50; // Less damage than health
+    
+        // When
+    
+        // Then
+        Assert.False(otherTesting.TakeDamage(damage)); // False because player is not defeated
+
+    }
+
+    [Fact]
+    public void Player_FindItemByName_ReturnsCorrectItems()
     {
         // Given
         Item itemObj = new ItemMaster().MakeLoot();
@@ -139,7 +152,7 @@ public class Player
     }
 
     [Fact]
-    public void PlayerMovePlayer_ReturnsTrueWhenMoveIsValid()
+    public void Player_MovePlayer_ReturnsTrueWhenMoveIsValid()
     {
         // Given
         QuestForge.Zone Forest = new QuestForge.Zone("Forest", "A dense and mysterious forest filled with unknown dangers.", 'E');
@@ -155,7 +168,8 @@ public class Player
         Assert.Equal(Forest, otherTesting.CurrentZone);
     }
 
-    public void PlayerMovePlayer_ReturnsFalseWhenMoveIsInvalid()
+    [Fact]
+    public void Player_MovePlayer_ReturnsFalseWhenMoveIsInvalid()
     {
         // Given
         QuestForge.ZoneManager zm = new QuestForge.ZoneManager();
@@ -172,15 +186,83 @@ public class Player
 
 public class Enemy
 {
-    public QuestForge.Enemy otherTesting = new QuestForge.EnemyMaster().CreateEnemy(EnemyTypes.Easy, "Goblin", "A small and mischievous creature.");
+    public QuestForge.EnemyMaster otherTesting = new QuestForge.EnemyMaster();
 
     [Fact]
-    public void ()
+    public void EnemyMaster_CreateEasyEnemy_ReturnsCorrectEnemy()
     {
         // Given
-    
+        QuestForge.EnemyTypes enemyType = QuestForge.EnemyTypes.Easy;
+        string name = "Goblin";
+        string description = "A small and mischievous creature.";
+
+        // When
+        QuestForge.Enemy enemy = otherTesting.CreateEnemy(enemyType, name, description);
+
+        // Then
+        Assert.Equal(enemyType, enemy.Type);
+        Assert.Equal(50, enemy.Health);
+        Assert.Equal(10, enemy.Attack);
+    }
+
+    [Fact]
+    public void EnemyMaster_CreateHardEnemy_ReturnsCorrectEnemy()
+    {
+        // Given
+        QuestForge.EnemyTypes enemyType = QuestForge.EnemyTypes.Hard;
+        string name = "Orc";
+        string description = "A large and brutish creature.";
+
+        // When
+        QuestForge.Enemy enemy = otherTesting.CreateEnemy(enemyType, name, description);
+
+        // Then
+        Assert.Equal(enemyType, enemy.Type);
+        Assert.Equal(100, enemy.Health);
+        Assert.Equal(20, enemy.Attack);
+    }
+
+    [Fact]
+    public void EnemyMaster_CreateBossEnemy_ReturnsCorrectEnemy()
+    {
+        // Given
+        QuestForge.EnemyTypes enemyType = QuestForge.EnemyTypes.Boss;
+        string name = "Dragon";
+        string description = "A powerful and fearsome creature.";
+
+        // When
+        QuestForge.Enemy enemy = otherTesting.CreateEnemy(enemyType, name, description);
+
+        // Then
+        Assert.Equal(enemyType, enemy.Type);
+        Assert.Equal(200, enemy.Health);
+        Assert.Equal(30, enemy.Attack);
+    }
+
+    [Fact]
+    public void Enemy_TakeDamage_ReturnsTrueWhenDefeated()
+    {
+        // Given
+        QuestForge.Enemy enemy = otherTesting.CreateEnemy(QuestForge.EnemyTypes.Easy, "Goblin", "A small and mischievous creature.");
+        double damage = 60; // More damage than health
+
         // When
     
         // Then
+        Assert.True(enemy.TakeDamage(damage));
+    }
+
+    [Fact]
+    public void Enemy_TakeDamage_ReturnsFalseWhenNotDefeated()
+    {
+        // Given
+        QuestForge.Enemy enemy = otherTesting.CreateEnemy(QuestForge.EnemyTypes.Easy, "Goblin", "A small and mischievous creature.");
+        double damage = 30; // Less damage than health
+
+        // When
+    
+        // Then
+        Assert.False(enemy.TakeDamage(damage));
     }
 }
+
