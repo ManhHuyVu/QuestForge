@@ -345,4 +345,26 @@ public class Item
         // Then
         Assert.Equal(10, player.Defense); // Player's defense should increase by armor's defense bonus
     }
+
+    [Fact]
+    public void ItemToString()
+    {
+        // Given
+        Item item = new Item("Sample Item", "Do nothing", 'W', 1.0, 10.0);
+        ItemWeapon weapon = new ItemWeapon("Sword of Destiny", "A legendary sword with immense power.", 'W', 15.0, 10.0, 20);
+        ItemArmor armor = new ItemArmor("Plate Armor", "A set of heavy plate armor.", 'A', 20.0, 15.0, 10);
+        ItemPotion potion = new ItemPotion("Health Potion", "A potion that restores health.", 'P', 0.5, 5.0, 50);
+
+        // When
+        string itemString = item.ToString();
+        string weaponString = weapon.ToString();
+        string armorString = armor.ToString();
+        string potionString = potion.ToString();
+
+        // Then
+        Assert.Contains("Sample Item", itemString);
+        Assert.Contains("Sword of Destiny", weaponString);
+        Assert.Contains("Plate Armor", armorString);
+        Assert.Contains("Health Potion", potionString);
+    }
 }
